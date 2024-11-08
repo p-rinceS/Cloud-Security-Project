@@ -1,0 +1,5 @@
+version: '3'
+
+services:
+  vulnerable-server:
+    build:./vulnerable-server
