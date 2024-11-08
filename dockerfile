@@ -8,7 +8,7 @@ RUN gcc -o /vulnerable_program /vulnerable_program.c
 
 RUN adduser -D vulnuser
 
-USER bulnuser
+USER vulnuser
 
 EXPOSE 8080
 
