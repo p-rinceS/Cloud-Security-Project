@@ -11,65 +11,86 @@
 
 #define PROGRAM "format"
 #define PORT    9090
+#define BUFFER_SIZE 256
 
 int socket_bind(int port);
 int server_accept(int listen_fd, struct sockaddr_in *client);
-char **generate_random_env();
+char **generate_random_env(int length);
 
 void main()
 {
     int listen_fd;
-    struct sockaddr_in  client;
+    struct sockaddr_in client;
 
     // Generate a random number
-    srand (time(NULL));
-    int random_n = rand()%2000; 
-   
+    srand(time(NULL));
+    int random_n = rand() % 2000;
+
     // handle signal from child processes
     signal(SIGCHLD, SIG_IGN);
 
     listen_fd = socket_bind(PORT);
-    while (1){
-	int socket_fd = server_accept(listen_fd, &client);
+    while (1) {
+        int socket_fd = server_accept(listen_fd, &client);
 
         if (socket_fd < 0) {
-	    perror("Accept failed");
+            perror("Accept failed");
             exit(EXIT_FAILURE);
         }
 
-	int pid = fork();
+        int pid = fork();
         if (pid == 0) {
-            // Redirect STDIN to this connection, so it can take input from user
-            dup2(socket_fd, STDIN_FILENO);
+            // Child process
+            close(listen_fd);
 
-	    /* Uncomment the following if we want to send the output back to user.
-	     * This is useful for remote attacks. 
-            int output_fd = socket(AF_INET, SOCK_STREAM, 0);
-            client.sin_port = htons(9091);
-	    if (!connect(output_fd, (struct sockaddr *)&client, sizeof(struct sockaddr_in))){
-               // If the connection is made, redirect the STDOUT to this connection
-               dup2(output_fd, STDOUT_FILENO);
-	    }
-	    */ 
+            // Buffer to store client input
+            char buffer[BUFFER_SIZE];
+            memset(buffer, 0, BUFFER_SIZE);
 
-	    // Invoke the program 
-	    fprintf(stderr, "Starting %s\n", PROGRAM);
-            //execl(PROGRAM, PROGRAM, (char *)NULL);
-	    // Using the following to pass an empty environment variable array
-            //execle(PROGRAM, PROGRAM, (char *)NULL, NULL);
-	    
-	    // Using the following to pass a randomly generated environment varraible array.
-	    // This is useful to slight randomize the stack's starting point.
-            execle(PROGRAM, PROGRAM, (char *)NULL, generate_random_env(random_n));
-        }
-        else {
+            while (1) {
+                // Read data from the client
+                int bytes_read = recv(socket_fd, buffer, BUFFER_SIZE - 1, 0);
+                if (bytes_read <= 0) {
+                    if (bytes_read < 0) {
+                        perror("recv failed");
+                    }
+                    close(socket_fd);
+                    exit(EXIT_FAILURE);
+                }
+
+                buffer[bytes_read] = '\0';
+
+                printf("Received from client: %s\n", buffer);
+
+                // Check for buffer overflow
+                if (bytes_read >= BUFFER_SIZE - 1) {
+                    const char *overflow_msg = "Buffer overflow detected\n";
+                    send(socket_fd, overflow_msg, strlen(overflow_msg), 0);
+                } else {
+                    const char *no_overflow_msg = "No buffer overflow\n";
+                    send(socket_fd, no_overflow_msg, strlen(no_overflow_msg), 0);
+                }
+
+                // Redirect STDIN to this connection, so it can take input from user
+                dup2(socket_fd, STDIN_FILENO);
+
+                // Invoke the program
+                fprintf(stderr, "Starting %s\n", PROGRAM);
+                execle(PROGRAM, PROGRAM, (char *)NULL, generate_random_env(random_n));
+
+                // If execle fails
+                perror("execle failed");
+                close(socket_fd);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            // Parent process
             close(socket_fd);
-	}
-    } 
+        }
+    }
 
     close(listen_fd);
 }
-
 
 int socket_bind(int port)
 {
@@ -123,16 +144,10 @@ int server_accept(int listen_fd, struct sockaddr_in *client)
 // the stack location. This is used to add some randomness to the lab.
 char **generate_random_env(int length)
 {
-    const char *name = "randomstring=";
-    char **env;
-
-    env = malloc(2*sizeof(char *));
-
-    env[0] = (char *) malloc((length + strlen(name))*sizeof(char));
-    strcpy(env[0], name);
-    memset(env[0] + strlen(name), 'A', length -1);
-    env[0][length + strlen(name) - 1] = 0;
-    env[1] = 0;
+    char **env = malloc(2 * sizeof(char *));
+    env[0] = malloc(length);
+    memset(env[0], 'A', length - 1);
+    env[0][length - 1] = '\0';
+    env[1] = NULL;
     return env;
 }
-
