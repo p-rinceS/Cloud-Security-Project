@@ -7,4 +7,5 @@ services:
       dockerfile: Dockerfile
     ports:
       - "9090:9090"
+      - "9091:9091"
       - "2222:22"
