@@ -8,9 +8,18 @@ services:
       - "9091:9091"
       - "2222:22"
     container_name: threaded_server_container
+    networks:
+      - my_network
 
-  hello_world:
+  hello_world_container:
     build:
-      context: ./vulnerable-server
-      dockerfile: Dockerfile
+      context: ./hello-server
     container_name: hello_world_container
+    ports:
+      - "8080:8080"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
