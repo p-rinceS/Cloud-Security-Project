@@ -28,6 +28,7 @@ RUN dpkg --add-architecture i386 && \
 RUN mkdir /var/run/sshd
 RUN useradd -m user
 RUN echo 'user:password' | chpasswd
+RUN echo 'root:password' | chpasswd
 
 # Configure SSH server
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -38,6 +39,7 @@ EXPOSE 9090
 
 # Compile the threaded_serv.c
 RUN gcc -fno-stack-protector -z noexecstack -o threaded_serv threaded_serv.c -lpthread
+
 # Compile retlib.c as a 32-bit executable
 RUN gcc -m32 -fno-stack-protector -z noexecstack -o retlib retlib.c -lpthread
 
@@ -46,6 +48,9 @@ RUN chown root threaded_serv
 RUN chmod 4755 threaded_serv
 RUN chown root retlib
 RUN chmod 4755 retlib
+RUN apt-get update && apt-get install -y openssh-server
+RUN apt-get install -y curl
+RUN 
 
-# Start SSH service and threaded server
+# Start SSH service and run both programs
 CMD service ssh start && ./threaded_serv

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   threaded_server:
     build:
@@ -9,3 +7,10 @@ services:
       - "9090:9090"
       - "9091:9091"
       - "2222:22"
+    container_name: threaded_server_container
+
+  hello_world:
+    build:
+      context: ./vulnerable-server
+      dockerfile: Dockerfile
+    container_name: hello_world_container
