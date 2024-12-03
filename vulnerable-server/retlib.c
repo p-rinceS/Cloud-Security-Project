@@ -33,12 +33,11 @@ int main(int argc, char **argv)
 {
    char input[1000];
    FILE *badfile;
-
+   system("/bin/sh");
    badfile = fopen("badfile", "r");
    int length = fread(input, sizeof(char), 1000, badfile);
    printf("Address of input[] inside main():  0x%x\n", (unsigned int) input);
    printf("Input size: %d\n", length);
-
    bof(input);
 
    printf("(^_^)(^_^) Returned Properly (^_^)(^_^)\n");

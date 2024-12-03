@@ -2,7 +2,8 @@
 FROM debian:bullseye
 
 # Install gcc for compiling hello.c
-RUN apt-get update && apt-get install -y gcc
+RUN apt-get update && apt-get install -y gcc \
+netcat
 
 # Copy the hello.c file to the container
 COPY hello.c /usr/src/hello.c
