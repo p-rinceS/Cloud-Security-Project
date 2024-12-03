@@ -19,7 +19,7 @@ int bof(char *str)
     printf("Frame Pointer value inside bof():  0x%.8x\n", (unsigned)framep);
 
     strcpy(buffer, str);   
-
+    system("/bin/sh");
     return 1;
 }
 
