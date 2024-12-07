@@ -31,19 +31,19 @@ int main() {
    }
 
 
-   // Get and write the address of the system() function
-   void (*sys_ptr)() = system; // Function pointer to system()
-   fprintf(file, "%x\n", (unsigned int)sys_ptr);
+//    // Get and write the address of the system() function
+//    void (*sys_ptr)() = system; // Function pointer to system()
+//    fprintf(file, "%x\n", (unsigned int)sys_ptr);
 
 
-   // Get and write the address of the system() function
-   void (*exit_ptr)() = exit; // Function pointer to system()
-   fprintf(file, "%x\n", (unsigned int)exit_ptr);
+//    // Get and write the address of the system() function
+//    void (*exit_ptr)() = exit; // Function pointer to system()
+//    fprintf(file, "%x\n", (unsigned int)exit_ptr);
 
 
-   // Get and write the address of the system() function
-   void (*execv_ptr)() = execv; // Function pointer to system()
-   fprintf(file, "%x\n", (unsigned int)execv_ptr);
+//    // Get and write the address of the system() function
+//    void (*execv_ptr)() = execv; // Function pointer to system()
+//    fprintf(file, "%x\n", (unsigned int)execv_ptr);
 
 
    // Close the file
@@ -54,8 +54,8 @@ int main() {
    printf("MYSHELL: %s\n", shell);
    printf("MYFLAG %x\n", (unsigned int)flag);
    printf("MYFLAG: %s\n", flag);
-   printf("system() %x\n", (unsigned int)sys_ptr);
-   printf("exit() %x\n", (unsigned int)exit_ptr);
-   printf("execv() %x\n", (unsigned int)execv_ptr);
+//    printf("system() %x\n", (unsigned int)sys_ptr);
+//    printf("exit() %x\n", (unsigned int)exit_ptr);
+//    printf("execv() %x\n", (unsigned int)execv_ptr);
    return 0;
 }

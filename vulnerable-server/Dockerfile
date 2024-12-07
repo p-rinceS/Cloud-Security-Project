@@ -59,13 +59,14 @@ RUN chown root retlib
 RUN chmod 4755 retlib
 RUN chown user printenv
 RUN chmod 777 printenv
+RUN gdb -batch -x gdb_commands.gdb retlib > gdb_output.txt
 RUN ./printenv
+RUN python3 extract.py
 RUN python3 exploit2.py
 RUN apt-get update && apt-get install -y openssh-server
 RUN apt-get install -y curl
 RUN chsh -s $(which zsh)
 RUN ln -sf /bin/zsh /bin/sh
-RUN gdb -batch -x gdb_commands.gdb retlib > gdb_output.txt
 
 # Start SSH service and run both programs
 CMD service ssh start && ./threaded_serv
