@@ -25,7 +25,8 @@ RUN dpkg --add-architecture i386 && \
     lib32stdc++6 \
     netcat \
     python3 \
-    zsh
+    zsh \
+    gdb 
 
 # Create SSH directory and set root password
 RUN mkdir /var/run/sshd
@@ -50,18 +51,21 @@ RUN gcc -m32 -fno-stack-protector -z noexecstack -o retlib retlib.c -lpthread
 RUN gcc -m32 -o printenv  printenv.c
 
 # Set permissions for the executables
-RUN export MYSHELL=/bin/bash
-RUN export MYFLAG=-p
+ENV MYSHELL=/bin/bash
+ENV MYFLAG=-p
 RUN chown root threaded_serv
 RUN chmod 4755 threaded_serv
 RUN chown root retlib
 RUN chmod 4755 retlib
 RUN chown user printenv
 RUN chmod 777 printenv
+RUN ./printenv
+RUN python3 exploit2.py
 RUN apt-get update && apt-get install -y openssh-server
 RUN apt-get install -y curl
 RUN chsh -s $(which zsh)
 RUN ln -sf /bin/zsh /bin/sh
+RUN gdb -batch -x gdb_commands.gdb retlib > gdb_output.txt
 
 # Start SSH service and run both programs
 CMD service ssh start && ./threaded_serv
